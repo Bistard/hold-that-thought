@@ -1,0 +1,48 @@
+# compiled output
+dist/
+build/
+bin/
+output/
+out/
+
+# dependencies
+node_modules/
+
+# tempoary files
+temp/
+tmp/
+.temp/
+*.tmp
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# environments
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# logs
+logs/
+*.log
+.VSCodeCounter
+
+# local files
+local/
+*.local
+*.local.*
+!*.local.example
+!*.example.local
+
+# agents
+memory/
