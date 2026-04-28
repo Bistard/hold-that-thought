@@ -3,10 +3,10 @@ import { existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
-export const SENSEVOICE_MODEL_URL =
-  'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.tar.bz2';
+export const ZIPFORMER_MODEL_URL =
+  'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-small-ctc-zh-2025-04-01.tar.bz2';
 
-export const SENSEVOICE_FILES = [
+export const ZIPFORMER_FILES = [
   'model.onnx',
   'tokens.txt',
 ];
@@ -14,7 +14,7 @@ export const SENSEVOICE_FILES = [
 /** Check if model files are already cached locally. */
 export function isModelCached(model: string, modelsDir: string): boolean {
   const modelDir = join(modelsDir, model);
-  return SENSEVOICE_FILES.every((f) => existsSync(join(modelDir, f)));
+  return ZIPFORMER_FILES.every((f) => existsSync(join(modelDir, f)));
 }
 
 /** Validate model name does not traverse outside modelsDir and is a known model. */
@@ -27,7 +27,7 @@ function validateModel(model: string, modelsDir: string): void {
 
 /** Look up the download URL for a known model name. */
 function modelUrl(model: string): string | null {
-  if (model === 'sensevoice') return SENSEVOICE_MODEL_URL;
+  if (model === 'zipformer-zh-small') return ZIPFORMER_MODEL_URL;
   return null;
 }
 

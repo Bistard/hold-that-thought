@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { join } from 'node:path';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { ensureModel, isModelCached, SENSEVOICE_MODEL_URL, SENSEVOICE_FILES } from './model-download.js';
+import { ensureModel, isModelCached, ZIPFORMER_MODEL_URL, ZIPFORMER_FILES } from './model-download.js';
 
 describe('model-download', () => {
   const testDir = join(process.cwd(), '.htt', 'test-models');
@@ -14,47 +14,47 @@ describe('model-download', () => {
     rmSync(testDir, { recursive: true, force: true });
   });
 
-  it('SENSEVOICE_MODEL_URL is a valid URL string', () => {
-    expect(SENSEVOICE_MODEL_URL).toMatch(/^https:\/\//);
+  it('ZIPFORMER_MODEL_URL is a valid URL string', () => {
+    expect(ZIPFORMER_MODEL_URL).toMatch(/^https:\/\//);
   });
 
-  it('SENSEVOICE_FILES lists expected model files', () => {
-    expect(SENSEVOICE_FILES.length).toBeGreaterThan(0);
-    expect(SENSEVOICE_FILES).toContain('model.onnx');
-    expect(SENSEVOICE_FILES).toContain('tokens.txt');
+  it('ZIPFORMER_FILES lists expected model files', () => {
+    expect(ZIPFORMER_FILES.length).toBeGreaterThan(0);
+    expect(ZIPFORMER_FILES).toContain('model.onnx');
+    expect(ZIPFORMER_FILES).toContain('tokens.txt');
   });
 
   it('isModelCached returns true when model files exist', () => {
-    const modelDir = join(testDir, 'sensevoice');
+    const modelDir = join(testDir, 'zipformer-zh-small');
     mkdirSync(modelDir, { recursive: true });
-    for (const f of SENSEVOICE_FILES) {
+    for (const f of ZIPFORMER_FILES) {
       writeFileSync(join(modelDir, f), 'dummy');
     }
 
-    expect(isModelCached('sensevoice', testDir)).toBe(true);
+    expect(isModelCached('zipformer-zh-small', testDir)).toBe(true);
   });
 
   it('isModelCached returns false when model not cached', () => {
-    expect(isModelCached('sensevoice', testDir)).toBe(false);
+    expect(isModelCached('zipformer-zh-small', testDir)).toBe(false);
   });
 
   it('isModelCached returns false when only partial files cached', () => {
-    const modelDir = join(testDir, 'sensevoice');
+    const modelDir = join(testDir, 'zipformer-zh-small');
     mkdirSync(modelDir, { recursive: true });
     // Only create one of the expected files
-    writeFileSync(join(modelDir, SENSEVOICE_FILES[0]), 'dummy');
+    writeFileSync(join(modelDir, ZIPFORMER_FILES[0]), 'dummy');
 
-    expect(isModelCached('sensevoice', testDir)).toBe(false);
+    expect(isModelCached('zipformer-zh-small', testDir)).toBe(false);
   });
 
   it('ensureModel returns cached path without downloading', async () => {
-    const modelDir = join(testDir, 'sensevoice');
+    const modelDir = join(testDir, 'zipformer-zh-small');
     mkdirSync(modelDir, { recursive: true });
-    for (const f of SENSEVOICE_FILES) {
+    for (const f of ZIPFORMER_FILES) {
       writeFileSync(join(modelDir, f), 'dummy');
     }
 
-    const path = await ensureModel('sensevoice', testDir);
+    const path = await ensureModel('zipformer-zh-small', testDir);
     expect(path).toBe(modelDir);
   });
 

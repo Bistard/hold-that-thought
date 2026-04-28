@@ -57,11 +57,10 @@ export class SherpaSTT implements SpeechToText {
 
       this.recognizer = new sherpa.OnlineRecognizer({
         modelConfig: {
-          senseVoice: {
+          zipformer2Ctc: {
             model: modelPath + '/model.onnx',
-            tokens: modelPath + '/tokens.txt',
-            useInverseTextNormalization: true,
           },
+          tokens: modelPath + '/tokens.txt',
         },
         enableEndpoint: true,
         rule1MinTrailingSilence: 2.4,

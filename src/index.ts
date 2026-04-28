@@ -29,7 +29,7 @@ program
   .description('启动转录监听')
   .option('--window <duration>', '滚动窗口时长', '8h')
   .option('--hot <duration>', '热缓冲时长', '30m')
-  .option('--model <name>', 'STT 模型名称', 'sensevoice')
+  .option('--model <name>', 'STT 模型名称', 'zipformer-zh-small')
   .action(async (opts) => {
     let manager: BufferManager | undefined;
     try {
