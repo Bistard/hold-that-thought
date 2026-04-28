@@ -32,7 +32,7 @@ cd "P:\work\code\hold-that-thought" && pnpm init
   "description": "本地优先的实时转录缓冲工具",
   "type": "module",
   "bin": {
-    "htd": "./dist/index.js"
+    "htt": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -97,9 +97,9 @@ export default defineConfig({
 - [ ] **Step 7: 验证构建链路**
 
 ```bash
-mkdir -p src && echo 'console.log("htd");' > src/index.ts && pnpm build && node dist/index.js
+mkdir -p src && echo 'console.log("htt");' > src/index.ts && pnpm build && node dist/index.js
 ```
-Expected: 输出 `htd`
+Expected: 输出 `htt`
 
 - [ ] **Step 8: 提交**
 
@@ -1002,7 +1002,7 @@ function parseDuration(s: string): number {
 const program = new Command();
 
 program
-  .name('htd')
+  .name('htt')
   .description('Hold That Thought — 本地优先实时转录缓冲工具')
   .version('0.1.0');
 
@@ -1012,7 +1012,7 @@ program
   .option('--window <duration>', '滚动窗口时长', '8h')
   .option('--hot <duration>', '热缓冲时长', '30m')
   .action((opts) => {
-    const dataDir = join(homedir(), '.htd');
+    const dataDir = join(homedir(), '.htt');
     mkdirSync(dataDir, { recursive: true });
     const dbPath = join(dataDir, 'transcripts.db');
 

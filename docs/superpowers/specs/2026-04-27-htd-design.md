@@ -2,7 +2,7 @@
 
 ## 概述
 
-**Hold That Thought (htd)** 是一个本地优先的实时转录缓冲工具。持续监听音频输入，滚动保留最近 8 小时内容，支持按时间窗口导出。
+**Hold That Thought (htt)** 是一个本地优先的实时转录缓冲工具。持续监听音频输入，滚动保留最近 8 小时内容，支持按时间窗口导出。
 
 - **技术栈**：Node.js 22 + pnpm + TypeScript (strict, ESM)
 - **v1 目标**：跑通 监听→缓冲→导出 核心流程，STT 用 stdin mock，AI 总结预留接口
@@ -16,7 +16,7 @@
 
 ```
 src/
-├── index.ts              # CLI 入口（htd start → REPL）
+├── index.ts              # CLI 入口（htt start → REPL）
 ├── audio/
 │   └── interface.ts      # AudioSource 接口
 ├── stt/
@@ -105,7 +105,7 @@ stdin 逐行输入
 
 **关键流程：**
 
-1. **启动** (`htd start`)：初始化 SQLite 建表 → 从 DB 加载最近 8 小时数据到热缓冲 → 启动 stdin 监听 → 进入 REPL
+1. **启动** (`htt start`)：初始化 SQLite 建表 → 从 DB 加载最近 8 小时数据到热缓冲 → 启动 stdin 监听 → 进入 REPL
 2. **新文本到达**：`push(segment)` → 追加到热缓冲 Deque → 热缓冲中时间跨度超 30 分钟时，最旧部分批量 flush 到 SQLite
 3. **过期清理**：每 10 分钟定时 → `DELETE FROM segments WHERE timestamp < now - 8h`
 4. **导出** (`/export`)：`query(start, end)` → 从热缓冲 + SQLite 合并查询 → 按时间戳排序 → 格式化输出
@@ -118,13 +118,13 @@ stdin 逐行输入
 **启动命令：**
 
 ```
-htd start [--window 8h] [--hot 30m]
+htt start [--window 8h] [--hot 30m]
 ```
 
 **进入 REPL 后的体验：**
 
 ```
-$ htd start
+$ htt start
 
 [14:05:32] 张：我们下午的会议定在三点...
 [14:05:45] 李：好的，我把会议室定在三楼
@@ -203,5 +203,5 @@ $ htd start
 - AI 总结（DeepSeek API 对接）
 - 说话人识别
 - 后台守护进程模式
-- 配置文件（`~/.htdrc` 等）
+- 配置文件（`~/.httrc` 等）
 - 端到端集成测试
