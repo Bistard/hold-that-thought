@@ -62,7 +62,7 @@ $ htt start
 ## 技术栈
 
 - **运行时**：Node.js 18+ / TypeScript (strict, ESM)
-- **存储**：sql.js (WASM SQLite)，数据文件位于 `~/.htt/transcripts.db`
+- **存储**：sql.js (WASM SQLite)，数据文件位于 `.htt/transcripts.db`（项目根目录）
 - **交互**：Node 原生 readline
 
 ## 开发

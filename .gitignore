@@ -46,3 +46,6 @@ local/
 
 # agents
 memory/
+
+# transcript data
+.htt/

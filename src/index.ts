@@ -3,7 +3,6 @@ import { Command } from 'commander';
 import { SegmentStore } from './buffer/store.js';
 import { BufferManager } from './buffer/manager.js';
 import { startRepl } from './repl/repl.js';
-import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 
@@ -27,9 +26,8 @@ program
   .option('--window <duration>', '滚动窗口时长', '8h')
   .option('--hot <duration>', '热缓冲时长', '30m')
   .action(async (opts) => {
-    const dataDir = join(homedir(), '.htt');
-    mkdirSync(dataDir, { recursive: true });
-    const dbPath = join(dataDir, 'transcripts.db');
+    const dbPath = join(process.cwd(), '.htt', 'transcripts.db');
+    mkdirSync(join(process.cwd(), '.htt'), { recursive: true });
 
     const windowMs = parseDuration(opts.window);
     const hotMs = parseDuration(opts.hot);
