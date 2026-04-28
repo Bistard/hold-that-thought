@@ -1,22 +1,66 @@
+import { spawn, type ChildProcess } from 'node:child_process';
 import type { AudioSource, AudioChunk } from './interface.js';
 
 export interface WasmAudioOptions {
-  deviceId?: number;
+  /** ffmpeg dshow audio device name. Use "default" for system default mic. */
+  deviceName?: string;
   sampleRate?: number;
   channelCount?: number;
 }
 
-// Minimal stub — replaced by Task 2 when naudiodon is available.
 export class WasmAudioSource implements AudioSource {
   private listeners: Record<string, Array<(...args: any[]) => void>> = {};
+  private ffmpeg: ChildProcess | null = null;
+  private opts: WasmAudioOptions;
 
-  constructor(_opts: WasmAudioOptions = {}) {}
-
-  start(): void {
-    this.emit('error', new Error('naudiodon 尚未编译，麦克风不可用'));
+  constructor(opts: WasmAudioOptions = {}) {
+    this.opts = {
+      deviceName: opts.deviceName ?? 'default',
+      sampleRate: opts.sampleRate ?? 16000,
+      channelCount: opts.channelCount ?? 1,
+    };
   }
 
-  stop(): void {}
+  start(): void {
+    if (this.ffmpeg) return; // already started
+
+    const args = [
+      '-f', 'dshow',
+      '-i', `audio=${this.opts.deviceName}`,
+      '-ac', String(this.opts.channelCount),
+      '-ar', String(this.opts.sampleRate),
+      '-f', 's16le',
+      'pipe:1',
+    ];
+
+    this.ffmpeg = spawn('ffmpeg', args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    this.ffmpeg.stdout!.on('data', (buf: Buffer) => {
+      this.emit('chunk', {
+        data: buf,
+        timestamp: Date.now(),
+      });
+    });
+
+    this.ffmpeg.on('error', (err) => {
+      this.emit('error', new Error(`ffmpeg 启动失败: ${err.message}`));
+    });
+
+    this.ffmpeg.on('exit', (code) => {
+      if (code !== 0 && code !== null) {
+        this.emit('error', new Error(`ffmpeg 异常退出 (code ${code})`));
+      }
+      this.ffmpeg = null;
+    });
+  }
+
+  stop(): void {
+    if (!this.ffmpeg) return;
+    this.ffmpeg.kill();
+    this.ffmpeg = null;
+  }
 
   on(event: 'chunk' | 'error', listener: (...args: any[]) => void): void {
     (this.listeners[event] ??= []).push(listener);
