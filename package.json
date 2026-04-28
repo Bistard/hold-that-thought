@@ -1,0 +1,33 @@
+{
+  "name": "hold-that-thought",
+  "version": "0.1.0",
+  "description": "本地优先的实时转录缓冲工具",
+  "type": "module",
+  "bin": {
+    "htd": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.6.0",
+    "@types/uuid": "^11.0.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  }
+}
