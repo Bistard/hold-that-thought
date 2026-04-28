@@ -110,4 +110,58 @@ describe('WasmAudioSource', () => {
 
     expect(spawn).toHaveBeenCalledTimes(1);
   });
+
+  it('emits error when ffmpeg spawn throws (ENOENT)', () => {
+    vi.mocked(spawn).mockImplementation(() => {
+      const err = new Error('spawn ffmpeg ENOENT');
+      (err as any).code = 'ENOENT';
+      throw err;
+    });
+
+    const errors: Error[] = [];
+    audio.on('error', (e: Error) => errors.push(e));
+
+    audio.start();
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toContain('ffmpeg 未找到');
+  });
+
+  it('does not emit error on clean exit (code 0)', () => {
+    const { proc, stdout } = mockSpawn();
+    Object.assign(proc, { stdout });
+    vi.mocked(spawn).mockReturnValue(proc as any);
+
+    const errors: Error[] = [];
+    audio.on('error', (e: Error) => errors.push(e));
+
+    audio.start();
+    proc.emit('exit', 0);
+
+    expect(errors.length).toBe(0);
+  });
+
+  it('stop/start cycle does not leak listeners or duplicate spawns', () => {
+    const { proc, stdout } = mockSpawn();
+    Object.assign(proc, { stdout });
+    proc.on = vi.fn();
+    vi.mocked(spawn).mockReturnValue(proc as any);
+
+    // Cycle 1: start then stop
+    audio.start();
+    expect(spawn).toHaveBeenCalledTimes(1);
+    audio.stop();
+    expect(proc.kill).toHaveBeenCalledTimes(1);
+
+    // Cycle 2: start again (should spawn a new proc)
+    const { proc: proc2, stdout: stdout2 } = mockSpawn();
+    Object.assign(proc2, { stdout: stdout2 });
+    proc2.on = vi.fn();
+    vi.mocked(spawn).mockReturnValue(proc2 as any);
+
+    audio.start();
+    expect(spawn).toHaveBeenCalledTimes(2);
+    audio.stop();
+    expect(proc2.kill).toHaveBeenCalledTimes(1);
+  });
 });

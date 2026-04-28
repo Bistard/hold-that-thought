@@ -11,6 +11,7 @@ export interface WasmAudioOptions {
 export class WasmAudioSource implements AudioSource {
   private listeners: Record<string, Array<(...args: any[]) => void>> = {};
   private ffmpeg: ChildProcess | null = null;
+  private stopping = false;
   private opts: WasmAudioOptions;
 
   constructor(opts: WasmAudioOptions = {}) {
@@ -33,9 +34,14 @@ export class WasmAudioSource implements AudioSource {
       'pipe:1',
     ];
 
-    this.ffmpeg = spawn('ffmpeg', args, {
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    try {
+      this.ffmpeg = spawn('ffmpeg', args, {
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+    } catch (err) {
+      this.emit('error', new Error(`ffmpeg 未找到: ${(err as Error).message}`));
+      return;
+    }
 
     this.ffmpeg.stdout!.on('data', (buf: Buffer) => {
       this.emit('chunk', {
@@ -49,6 +55,11 @@ export class WasmAudioSource implements AudioSource {
     });
 
     this.ffmpeg.on('exit', (code) => {
+      if (this.stopping) {
+        this.stopping = false;
+        this.ffmpeg = null;
+        return;
+      }
       if (code !== 0 && code !== null) {
         this.emit('error', new Error(`ffmpeg 异常退出 (code ${code})`));
       }
@@ -58,6 +69,9 @@ export class WasmAudioSource implements AudioSource {
 
   stop(): void {
     if (!this.ffmpeg) return;
+    this.ffmpeg.stdout?.removeAllListeners();
+    this.ffmpeg.removeAllListeners();
+    this.stopping = true;
     this.ffmpeg.kill();
     this.ffmpeg = null;
   }
