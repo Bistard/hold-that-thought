@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
 import { writeFileSync } from 'node:fs';
-import { v4 as uuid } from 'uuid';
+import { generateId } from '../id.js';
 import { BufferManager } from '../buffer/manager.js';
 import { exportTranscript } from '../export/exporter.js';
 import type { TextSegment } from '../types.js';
@@ -11,13 +11,14 @@ function formatTime(ms: number): string {
 }
 
 function parseTime(input: string): number {
-  const relMatch = input.match(/^-(\d+)(h|m)(?:(\d+)m)?$/);
+  const relMatch = input.match(/^([+-])(\d+)(h|m)(?:(\d+)m)?$/);
   if (relMatch) {
     let ms = 0;
-    if (relMatch[2] === 'h') ms += parseInt(relMatch[1]) * 3600_000;
-    else ms += parseInt(relMatch[1]) * 60_000;
-    if (relMatch[3]) ms += parseInt(relMatch[3]) * 60_000;
-    return Date.now() + ms;
+    if (relMatch[3] === 'h') ms += parseInt(relMatch[2]) * 3600_000;
+    else ms += parseInt(relMatch[2]) * 60_000;
+    if (relMatch[4]) ms += parseInt(relMatch[4]) * 60_000;
+    const sign = relMatch[1] === '-' ? -1 : 1;
+    return Date.now() + sign * ms;
   }
 
   const timeMatch = input.match(/^(\d{1,2}):(\d{2})$/);
@@ -88,7 +89,7 @@ export function startRepl(manager: BufferManager): void {
     } else {
       // Treat as transcript input
       const segment: TextSegment = {
-        id: uuid(),
+        id: generateId(),
         text: trimmed,
         timestamp: Date.now(),
       };

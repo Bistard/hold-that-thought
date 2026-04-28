@@ -1,5 +1,5 @@
 import { createInterface } from 'node:readline';
-import { v4 as uuid } from 'uuid';
+import { generateId } from '../id.js';
 import type { SpeechToText } from './interface.js';
 import type { TextSegment } from '../types.js';
 
@@ -12,7 +12,7 @@ export class StdinSTT implements SpeechToText {
       const trimmed = line.trim();
       if (!trimmed) return;
       const segment: TextSegment = {
-        id: uuid(),
+        id: generateId(),
         text: trimmed,
         timestamp: Date.now(),
       };
