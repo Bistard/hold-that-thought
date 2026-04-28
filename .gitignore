@@ -49,3 +49,6 @@ memory/
 
 # transcript data
 .htt/
+
+# worktrees
+.worktrees/
