@@ -17,7 +17,7 @@ function parseDuration(s: string): number {
 const program = new Command();
 
 program
-  .name('htd')
+  .name('htt')
   .description('Hold That Thought — 本地优先实时转录缓冲工具')
   .version('0.1.0');
 
@@ -27,7 +27,7 @@ program
   .option('--window <duration>', '滚动窗口时长', '8h')
   .option('--hot <duration>', '热缓冲时长', '30m')
   .action(async (opts) => {
-    const dataDir = join(homedir(), '.htd');
+    const dataDir = join(homedir(), '.htt');
     mkdirSync(dataDir, { recursive: true });
     const dbPath = join(dataDir, 'transcripts.db');
 

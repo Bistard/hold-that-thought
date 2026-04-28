@@ -17,16 +17,16 @@ pnpm build
 
 ```bash
 # 启动转录监听
-htd start
+htt start
 
 # 自定义窗口和热缓冲时长
-htd start --window 4h --hot 15m
+htt start --window 4h --hot 15m
 ```
 
 启动后进入交互式 REPL，直接输入文本作为转录内容：
 
 ```
-$ htd start
+$ htt start
 
 [14:05:32] 张：我们下午的会议定在三点...
 [14:05:45] 李：好的，我把会议室定在三楼
@@ -62,7 +62,7 @@ $ htd start
 ## 技术栈
 
 - **运行时**：Node.js 18+ / TypeScript (strict, ESM)
-- **存储**：sql.js (WASM SQLite)，数据文件位于 `~/.htd/transcripts.db`
+- **存储**：sql.js (WASM SQLite)，数据文件位于 `~/.htt/transcripts.db`
 - **交互**：Node 原生 readline
 
 ## 开发

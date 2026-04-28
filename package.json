@@ -4,7 +4,7 @@
   "description": "本地优先的实时转录缓冲工具",
   "type": "module",
   "bin": {
-    "htd": "./dist/index.js"
+    "htt": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
