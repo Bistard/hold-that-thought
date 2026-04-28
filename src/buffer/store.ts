@@ -1,4 +1,5 @@
-import initSqlJs, { type Database, type SqlJsStatic, type Statement } from 'sql.js';
+import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import type { TextSegment } from '../types.js';
 import { SCHEMA } from './schema.js';
 
@@ -16,43 +17,46 @@ async function getSQL(): Promise<SqlJsStatic> {
 
 export class SegmentStore {
   private db: Database;
-  private insertStmt: Statement;
-  private queryStmt: Statement;
-  private deleteStmt: Statement;
-  private rangeStmt: Statement;
+  private dbPath: string;
 
-  private constructor(db: Database) {
+  private constructor(db: Database, dbPath: string) {
     this.db = db;
+    this.dbPath = dbPath;
     this.db.run(SCHEMA);
-
-    this.insertStmt = this.db.prepare(
-      'INSERT OR REPLACE INTO segments (id, text, timestamp, speaker) VALUES (?, ?, ?, ?)',
-    );
-    this.queryStmt = this.db.prepare(
-      'SELECT id, text, timestamp, speaker FROM segments WHERE timestamp >= ? AND timestamp <= ? ORDER BY timestamp ASC',
-    );
-    this.deleteStmt = this.db.prepare(
-      'DELETE FROM segments WHERE timestamp < ?',
-    );
-    this.rangeStmt = this.db.prepare(
-      'SELECT MIN(timestamp) as min, MAX(timestamp) as max FROM segments',
-    );
   }
 
   static async create(dbPath: string): Promise<SegmentStore> {
     const sql = await getSQL();
-    const db = new sql.Database();
-    // sql.js is in-memory by default; dbPath is accepted for API compat but
-    // file persistence would require manual export/import of the binary data.
-    return new SegmentStore(db);
+    let db: Database;
+
+    if (dbPath === ':memory:') {
+      db = new sql.Database();
+    } else if (existsSync(dbPath)) {
+      const buffer = readFileSync(dbPath);
+      db = new sql.Database(new Uint8Array(buffer));
+    } else {
+      db = new sql.Database();
+    }
+
+    return new SegmentStore(db, dbPath);
+  }
+
+  save(): void {
+    if (this.dbPath === ':memory:') return;
+    const data = this.db.export();
+    writeFileSync(this.dbPath, Buffer.from(data));
   }
 
   insertBatch(segments: TextSegment[]): void {
     this.db.run('BEGIN');
     try {
+      const stmt = this.db.prepare(
+        'INSERT OR REPLACE INTO segments (id, text, timestamp, speaker) VALUES (?, ?, ?, ?)',
+      );
       for (const s of segments) {
-        this.insertStmt.run([s.id, s.text, s.timestamp, s.speaker ?? null]);
+        stmt.run([s.id, s.text, s.timestamp, s.speaker ?? null]);
       }
+      stmt.free();
       this.db.run('COMMIT');
     } catch (e) {
       this.db.run('ROLLBACK');
@@ -80,8 +84,6 @@ export class SegmentStore {
   }
 
   deleteOlderThan(timestamp: number): number {
-    this.deleteStmt.bind([timestamp]);
-    // sql.js doesn't return changes count directly from run; we track via a count first
     const countStmt = this.db.prepare(
       'SELECT COUNT(*) as cnt FROM segments WHERE timestamp < ?',
     );
@@ -89,33 +91,32 @@ export class SegmentStore {
     countStmt.step();
     const { cnt } = countStmt.getAsObject() as { cnt: number };
     countStmt.free();
+
     this.db.run('DELETE FROM segments WHERE timestamp < ?', [timestamp]);
     return cnt;
   }
 
   getTimeRange(): { min: number; max: number } | null {
-    this.rangeStmt.reset();
-    if (!this.rangeStmt.step()) {
-      this.rangeStmt.reset();
+    const stmt = this.db.prepare(
+      'SELECT MIN(timestamp) as min, MAX(timestamp) as max FROM segments',
+    );
+    if (!stmt.step()) {
+      stmt.free();
       return null;
     }
-    const row = this.rangeStmt.getAsObject() as { min: number | null; max: number | null };
-    this.rangeStmt.reset();
+    const row = stmt.getAsObject() as { min: number | null; max: number | null };
+    stmt.free();
     if (row.min === null || row.max === null) return null;
     return { min: row.min, max: row.max };
   }
 
   dbSize(): number {
-    // sql.js in-memory: return the binary export size as a proxy for db size
     const data = this.db.export();
     return data.length;
   }
 
   close(): void {
-    this.insertStmt.free();
-    this.queryStmt.free();
-    this.deleteStmt.free();
-    this.rangeStmt.free();
+    this.save();
     this.db.close();
   }
 }
