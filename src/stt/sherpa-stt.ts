@@ -5,12 +5,14 @@ import type { AudioSource, AudioChunk } from '../audio/interface.js';
 import { generateId } from '../id.js';
 
 const require = createRequire(import.meta.url);
+const SAMPLE_RATE = 16000;
 
 export class SherpaSTT implements SpeechToText {
   private listeners: Record<string, Array<(...args: any[]) => void>> = {};
   private recognizer: any = null;
   private stream: any = null;
   private running = false;
+  private initError: Error | null = null;
 
   constructor(audioSource: AudioSource, modelPath: string) {
     this.initRecognizer(modelPath);
@@ -33,8 +35,20 @@ export class SherpaSTT implements SpeechToText {
     this.running = false;
   }
 
+  on(event: 'segment', listener: (segment: TextSegment) => void): void;
+  on(event: 'error', listener: (err: Error) => void): void;
   on(event: 'segment' | 'error', listener: (...args: any[]) => void): void {
     (this.listeners[event] ??= []).push(listener);
+    if (event === 'error' && this.initError) {
+      listener(this.initError);
+    }
+  }
+
+  off(event: 'segment' | 'error', listener: (...args: any[]) => void): void {
+    const arr = this.listeners[event];
+    if (!arr) return;
+    const idx = arr.indexOf(listener);
+    if (idx !== -1) arr.splice(idx, 1);
   }
 
   private initRecognizer(modelPath: string): void {
@@ -59,30 +73,35 @@ export class SherpaSTT implements SpeechToText {
     } catch (err) {
       // Model files not available — recognizer stays null.
       // start/stop/on still work; segments just won't be emitted.
-      this.emit('error', err as Error);
+      this.initError = err as Error;
+      this.emit('error', this.initError);
     }
   }
 
   private processChunk(chunk: AudioChunk): void {
-    const buf = chunk.data;
-    const samples = new Float32Array(buf.length / 2);
-    for (let i = 0; i < samples.length; i++) {
-      samples[i] = buf.readInt16LE(i * 2) / 32768;
-    }
-
-    this.stream.acceptWaveform({ samples, sampleRate: 16000 });
-
-    while (this.recognizer.isReady(this.stream)) {
-      this.recognizer.decode(this.stream);
-      const result = this.recognizer.getResult(this.stream);
-      if (result.is_final && result.text) {
-        this.emit('segment', {
-          id: generateId(),
-          text: result.text,
-          timestamp: Date.now(),
-        } as TextSegment);
+    try {
+      const buf = chunk.data;
+      const samples = new Float32Array(buf.length / 2);
+      for (let i = 0; i < samples.length; i++) {
+        samples[i] = buf.readInt16LE(i * 2) / 32768;
       }
-      this.recognizer.reset(this.stream);
+
+      this.stream.acceptWaveform({ samples, sampleRate: SAMPLE_RATE });
+
+      while (this.recognizer.isReady(this.stream)) {
+        this.recognizer.decode(this.stream);
+        const result = this.recognizer.getResult(this.stream);
+        if (result.is_final && result.text) {
+          this.emit('segment', {
+            id: generateId(),
+            text: result.text,
+            timestamp: Date.now(),
+          });
+        }
+        this.recognizer.reset(this.stream);
+      }
+    } catch (err) {
+      this.emit('error', err as Error);
     }
   }
 

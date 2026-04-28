@@ -36,8 +36,21 @@ describe('SherpaSTT', () => {
     stt.on('error', (e: Error) => errors.push(e));
 
     audio.emitError(new Error('mic pulled out'));
+    // initRecognizer may have already emitted an init error; forwarded error is last
+    expect(errors.length).toBeGreaterThanOrEqual(1);
+    const forwarded = errors.find((e) => e.message === 'mic pulled out');
+    expect(forwarded).toBeDefined();
+  });
+
+  it('emits error when model files are not found', () => {
+    const audio = createMockAudioSource();
+    const errors: Error[] = [];
+    const stt = new SherpaSTT(audio, '/nonexistent/model/path');
+    stt.on('error', (e: Error) => errors.push(e));
+
+    // initRecognizer runs synchronously in constructor, so errors should already be emitted
     expect(errors.length).toBe(1);
-    expect(errors[0].message).toBe('mic pulled out');
+    expect(errors[0].message).toBeTruthy();
   });
 
   it('does not emit segment when not started (running=false)', () => {
