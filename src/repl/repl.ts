@@ -5,6 +5,7 @@ import { BufferManager } from '../buffer/manager.js';
 import { exportTranscript } from '../export/exporter.js';
 import type { TextSegment } from '../types.js';
 import chalk from 'chalk';
+import type { AudioSource } from '../audio/interface.js';
 
 function formatTime(ms: number): string {
   return new Date(ms).toLocaleTimeString('zh-CN', { hour12: false });
@@ -65,7 +66,7 @@ function parseArgs(args: string[]): Record<string, string> {
   return result;
 }
 
-export function startRepl(manager: BufferManager): void {
+export function startRepl(manager: BufferManager, audioSource?: AudioSource): void {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -73,7 +74,11 @@ export function startRepl(manager: BufferManager): void {
   });
 
   console.log(chalk.dim('Hold That Thought — 实时转录缓冲已启动'));
-  console.log(chalk.dim('直接输入文本作为转录内容，以 / 开头为命令，输入 /help 查看帮助'));
+  if (audioSource) {
+    console.log(chalk.dim('麦克风已开启，直接说话即可转录。输入 /help 查看帮助'));
+  } else {
+    console.log(chalk.dim('直接输入文本作为转录内容，以 / 开头为命令，输入 /help 查看帮助'));
+  }
   console.log(chalk.dim('Ctrl+C 退出'));
   console.log('');
 
@@ -86,7 +91,7 @@ export function startRepl(manager: BufferManager): void {
 
     if (trimmed.startsWith('/')) {
       try {
-        handleCommand(trimmed, manager, rl);
+        handleCommand(trimmed, manager, rl, audioSource);
       } catch (err) {
         console.log(chalk.red(`错误: ${(err as Error).message}`));
       }
@@ -115,6 +120,7 @@ export function startRepl(manager: BufferManager): void {
   });
 
   rl.on('close', () => {
+    audioSource?.stop();
     console.log(chalk.yellow('\n正在保存缓冲数据...'));
     manager.shutdown();
     console.log(chalk.green('再见。'));
@@ -124,7 +130,7 @@ export function startRepl(manager: BufferManager): void {
   rl.prompt();
 }
 
-function handleCommand(input: string, manager: BufferManager, rl: readline.Interface): void {
+function handleCommand(input: string, manager: BufferManager, rl: readline.Interface, audioSource?: AudioSource): void {
   const parts = input.slice(1).split(/\s+/);
   const cmd = parts[0];
 
@@ -180,6 +186,8 @@ function handleCommand(input: string, manager: BufferManager, rl: readline.Inter
           '  /status                        查看缓冲状态',
           '  /help                          显示帮助',
           '  /quit                          退出',
+          '  /mic on                        开启麦克风监听',
+          '  /mic off                       暂停麦克风监听',
           '',
           '时间格式: 14:00 | -30m | -1h | 10am | 3pm | "2026-04-27 14:30"',
         ].join('\n'),
@@ -188,6 +196,23 @@ function handleCommand(input: string, manager: BufferManager, rl: readline.Inter
     case 'quit':
       rl.close();
       break;
+    case 'mic': {
+      if (!audioSource) {
+        console.log(chalk.red('麦克风功能未启用'));
+        return;
+      }
+      const action = parts[1];
+      if (action === 'on') {
+        audioSource.start();
+        console.log(chalk.green('麦克风已开启'));
+      } else if (action === 'off') {
+        audioSource.stop();
+        console.log(chalk.yellow('麦克风已暂停'));
+      } else {
+        console.log(chalk.red('用法: /mic on | /mic off'));
+      }
+      break;
+    }
     default:
       console.log(chalk.red(`未知命令: /${cmd}，输入 /help 查看可用命令`));
   }
