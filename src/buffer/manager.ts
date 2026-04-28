@@ -32,7 +32,7 @@ export class BufferManager {
     const fromDb = this.store.query(from, to);
     const fromHot = this.hot.filter((s) => s.timestamp >= from && s.timestamp <= to);
 
-    // Merge and deduplicate (hot buffer takes precedence over DB for same id)
+    // Merge and deduplicate (DB takes precedence over hot buffer for same id)
     const dbIds = new Set(fromDb.map((s) => s.id));
     const merged = [...fromDb, ...fromHot.filter((s) => !dbIds.has(s.id))];
     merged.sort((a, b) => a.timestamp - b.timestamp);
@@ -68,20 +68,22 @@ export class BufferManager {
 
     const cutoff = newest - this.options.hotMs;
     const toFlush: TextSegment[] = [];
-    while (this.hot.length > 0 && this.hot[0].timestamp < cutoff) {
-      toFlush.push(this.hot.shift()!);
+    for (const s of this.hot) {
+      if (s.timestamp < cutoff) toFlush.push(s);
+      else break;
     }
     if (toFlush.length > 0) {
       this.store.insertBatch(toFlush);
       this.store.save();
+      this.hot.splice(0, toFlush.length);
     }
   }
 
   private flushAll(): void {
     if (this.hot.length > 0) {
       this.store.insertBatch(this.hot);
-      this.hot = [];
       this.store.save();
+      this.hot = [];
     }
   }
 

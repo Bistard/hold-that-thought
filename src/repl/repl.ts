@@ -85,7 +85,11 @@ export function startRepl(manager: BufferManager): void {
     }
 
     if (trimmed.startsWith('/')) {
-      handleCommand(trimmed, manager, rl);
+      try {
+        handleCommand(trimmed, manager, rl);
+      } catch (err) {
+        console.log(chalk.red(`错误: ${(err as Error).message}`));
+      }
     } else {
       // Treat as transcript input
       const segment: TextSegment = {
@@ -131,6 +135,11 @@ function handleCommand(input: string, manager: BufferManager, rl: readline.Inter
       const from = args.from ? parseTime(args.from) : now - 30 * 60_000;
       const to = args.to ? parseTime(args.to) : now;
 
+      if (isNaN(from) || isNaN(to)) {
+        console.log(chalk.red('错误: 无法解析时间参数'));
+        return;
+      }
+
       if (from > to) {
         console.log(chalk.red('错误: --from 不能晚于 --to'));
         return;
@@ -142,8 +151,12 @@ function handleCommand(input: string, manager: BufferManager, rl: readline.Inter
       const output = exportTranscript(segments, { format, from, to });
 
       if (args.output) {
-        writeFileSync(args.output, output, 'utf-8');
-        console.log(chalk.green(`已导出 ${segments.length} 条记录到 ${args.output}`));
+        try {
+          writeFileSync(args.output, output, 'utf-8');
+          console.log(chalk.green(`已导出 ${segments.length} 条记录到 ${args.output}`));
+        } catch (err) {
+          console.log(chalk.red(`错误: 无法写入文件 ${args.output} — ${(err as Error).message}`));
+        }
       } else {
         console.log(output);
       }
