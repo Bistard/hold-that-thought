@@ -38,6 +38,15 @@ describe('model-download', () => {
     expect(isModelCached('sensevoice', testDir)).toBe(false);
   });
 
+  it('isModelCached returns false when only partial files cached', () => {
+    const modelDir = join(testDir, 'sensevoice');
+    mkdirSync(modelDir, { recursive: true });
+    // Only create one of the expected files
+    writeFileSync(join(modelDir, SENSEVOICE_FILES[0]), 'dummy');
+
+    expect(isModelCached('sensevoice', testDir)).toBe(false);
+  });
+
   it('ensureModel returns cached path without downloading', async () => {
     const modelDir = join(testDir, 'sensevoice');
     mkdirSync(modelDir, { recursive: true });
@@ -47,5 +56,13 @@ describe('model-download', () => {
 
     const path = await ensureModel('sensevoice', testDir);
     expect(path).toBe(modelDir);
+  });
+
+  it('ensureModel with unknown model name throws', async () => {
+    await expect(ensureModel('unknown-model', testDir)).rejects.toThrow();
+  });
+
+  it('ensureModel rejects path traversal model names', async () => {
+    await expect(ensureModel('../../../etc', testDir)).rejects.toThrow('非法模型名称');
   });
 });
