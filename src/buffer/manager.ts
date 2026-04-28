@@ -44,7 +44,15 @@ export class BufferManager {
   }
 
   getTimeRange(): TimeRange | null {
-    return this.store.getTimeRange();
+    const dbRange = this.store.getTimeRange();
+    if (this.hot.length === 0) return dbRange;
+    const hotMin = this.hot[0].timestamp;
+    const hotMax = this.hot[this.hot.length - 1].timestamp;
+    if (!dbRange) return { min: hotMin, max: hotMax };
+    return {
+      min: Math.min(dbRange.min, hotMin),
+      max: Math.max(dbRange.max, hotMax),
+    };
   }
 
   shutdown(): void {

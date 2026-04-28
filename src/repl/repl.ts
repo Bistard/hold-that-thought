@@ -130,6 +130,12 @@ function handleCommand(input: string, manager: BufferManager, rl: readline.Inter
       const now = Date.now();
       const from = args.from ? parseTime(args.from) : now - 30 * 60_000;
       const to = args.to ? parseTime(args.to) : now;
+
+      if (from > to) {
+        console.log(chalk.red('错误: --from 不能晚于 --to'));
+        return;
+      }
+
       const format = (args.format === 'md' ? 'md' : 'txt') as 'txt' | 'md';
 
       const segments = manager.query(from, to);

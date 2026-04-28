@@ -1,5 +1,5 @@
 import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import type { TextSegment } from '../types.js';
 import { SCHEMA } from './schema.js';
 
@@ -111,8 +111,14 @@ export class SegmentStore {
   }
 
   dbSize(): number {
-    const data = this.db.export();
-    return data.length;
+    if (this.dbPath === ':memory:') {
+      return this.db.export().length;
+    }
+    try {
+      return statSync(this.dbPath).size;
+    } catch {
+      return 0;
+    }
   }
 
   close(): void {
