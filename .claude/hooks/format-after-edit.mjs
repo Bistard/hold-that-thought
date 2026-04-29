@@ -44,8 +44,8 @@ if (!withinProject) {
 }
 
 try {
-	execFileSync('pnpm', ['exec', 'prettier', '--write', '--ignore-unknown', `"${abs}"`], {
-		stdio: 'ignore',
+	execFileSync('pnpm', ['exec', 'prettier', '--write', '--ignore-unknown', abs], {
+		stdio: 'pipe',
 		cwd,
 		shell: true,
 	});
