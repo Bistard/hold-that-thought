@@ -49,7 +49,7 @@
 	"hooks": {
 		"Notification": [
 			{
-				"matcher": "",
+				"matcher": "permission_prompt|elicitation_complete|elicitation_dialog",
 				"hooks": [
 					{
 						"type": "command",
