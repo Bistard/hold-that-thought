@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { BufferManager } from './manager.js';
-import { SegmentStore } from './store.js';
+import { BufferManager } from '../../src/buffer/manager.js';
+import { SegmentStore } from '../../src/buffer/store.js';
 
 describe('BufferManager', () => {
 	let manager: BufferManager;
@@ -19,7 +19,7 @@ describe('BufferManager', () => {
 		vi.useRealTimers();
 	});
 
-	function makeSeg(text: string, offsetMs: number): import('../types.js').TextSegment {
+	function makeSeg(text: string, offsetMs: number): import('../../src/types.js').TextSegment {
 		return {
 			id: text + offsetMs,
 			text,

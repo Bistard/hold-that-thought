@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { SegmentStore } from './store.js';
+import { SegmentStore } from '../../src/buffer/store.js';
 
 const TEST_DB = ':memory:';
 

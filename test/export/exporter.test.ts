@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { exportTranscript } from './exporter.js';
-import type { TextSegment } from '../types.js';
+import { exportTranscript } from '../../src/export/exporter.js';
+import type { TextSegment } from '../../src/types.js';
 
 const SEG_A: TextSegment = { id: '1', text: '大家好', timestamp: 1745760000000, speaker: '张' };
 const SEG_B: TextSegment = { id: '2', text: '今天讨论项目进度', timestamp: 1745760005000 };
