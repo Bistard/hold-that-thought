@@ -14,6 +14,9 @@ importers:
       commander:
         specifier: ^14.0.3
         version: 14.0.3
+      sherpa-onnx-node:
+        specifier: ^1.13.0
+        version: 1.13.0
       sql.js:
         specifier: ^1.14.1
         version: 1.14.1
@@ -40,7 +43,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.0.0
+        specifier: ^8.59.1
         version: 8.59.1(eslint@9.39.4)(typescript@6.0.3)
       vitest:
         specifier: ^3.2.4
@@ -998,6 +1001,39 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  sherpa-onnx-darwin-arm64@1.13.0:
+    resolution: {integrity: sha512-dBAiGDPP83CL0rMmHIG2oD+eal4eUNVLumOu5Hsae1f4YPqJ2iXeGF7bZg8HphqQk86K9TfZ4L4NO496sUtuGw==}
+    cpu: [arm64]
+    os: [darwin]
+
+  sherpa-onnx-darwin-x64@1.13.0:
+    resolution: {integrity: sha512-/iV/uAkB6dkbqEmxLW4xVrhdAnFPKfA5RTXgeIDmX5926Y30JLWeaxHAnMK2M8swqDtv0Qrh+Ega77R96mP9Sw==}
+    cpu: [x64]
+    os: [darwin]
+
+  sherpa-onnx-linux-arm64@1.13.0:
+    resolution: {integrity: sha512-szaiEu0RN/OyaYc5hwaeYvyWvNwh/hmZRHyZKbhdbx8H9ydMgQzirMtKYO//I20l2Ufz0nUPwrpVh5L59jblLg==}
+    cpu: [arm64]
+    os: [linux]
+
+  sherpa-onnx-linux-x64@1.13.0:
+    resolution: {integrity: sha512-GYiXTe4lWAICZvJiIvqacCGlxe7A/QveLcgSWHkRidlJfuZ5skLTe4gA/7KoMaxcdhE+SXnlwDUSjVdOgzcOmQ==}
+    cpu: [x64]
+    os: [linux]
+
+  sherpa-onnx-node@1.13.0:
+    resolution: {integrity: sha512-2EHPV+6yxp40LQ6JjN3lw/v50bsXO268PtvqAddLgAqcWYTvWAvStPlthv1UTjp0CADhdxizAARkW/+5nQLeQQ==}
+
+  sherpa-onnx-win-ia32@1.13.0:
+    resolution: {integrity: sha512-m8h4rFQUnsI4NP7UezR+yCrdPsU84EUDvPjE/puPJaAlFxcIapD9K6ibnoK4+r3g3QwVbKCIxJnC+fCBW6qr+A==}
+    cpu: [ia32]
+    os: [win32]
+
+  sherpa-onnx-win-x64@1.13.0:
+    resolution: {integrity: sha512-vDNEt1ztlsG8LLDnuX3Km6WmUDZ9qcwcFhlv4ROERV1qxf9BjK8j3BTg56/1EpQjDogEKBJwi8a4cbiHGPL/hw==}
+    cpu: [x64]
+    os: [win32]
 
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
@@ -2022,6 +2058,33 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  sherpa-onnx-darwin-arm64@1.13.0:
+    optional: true
+
+  sherpa-onnx-darwin-x64@1.13.0:
+    optional: true
+
+  sherpa-onnx-linux-arm64@1.13.0:
+    optional: true
+
+  sherpa-onnx-linux-x64@1.13.0:
+    optional: true
+
+  sherpa-onnx-node@1.13.0:
+    optionalDependencies:
+      sherpa-onnx-darwin-arm64: 1.13.0
+      sherpa-onnx-darwin-x64: 1.13.0
+      sherpa-onnx-linux-arm64: 1.13.0
+      sherpa-onnx-linux-x64: 1.13.0
+      sherpa-onnx-win-ia32: 1.13.0
+      sherpa-onnx-win-x64: 1.13.0
+
+  sherpa-onnx-win-ia32@1.13.0:
+    optional: true
+
+  sherpa-onnx-win-x64@1.13.0:
+    optional: true
 
   siginfo@2.0.0: {}
 
