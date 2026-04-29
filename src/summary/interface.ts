@@ -1,3 +1,3 @@
 export interface Summarizer {
-  summarize(text: string): Promise<string>;
+	summarize(text: string): Promise<string>;
 }

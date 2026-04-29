@@ -1,37 +1,37 @@
 {
-  "name": "hold-that-thought",
-  "version": "0.1.0",
-  "description": "本地优先的实时转录缓冲工具",
-  "type": "module",
-  "bin": {
-    "htt": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc && node dist/index.js",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "chalk": "^5.6.2",
-    "commander": "^14.0.3",
-    "sql.js": "^1.14.1"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "@types/sql.js": "^1.4.11",
-    "prettier": "^3.8.3",
-    "typescript": "^6.0.3",
-    "vitest": "^3.2.4"
-  }
+	"name": "hold-that-thought",
+	"version": "0.1.0",
+	"description": "本地优先的实时转录缓冲工具",
+	"type": "module",
+	"bin": {
+		"htt": "./dist/index.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "tsc && node dist/index.js",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"typecheck": "tsc --noEmit"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"chalk": "^5.6.2",
+		"commander": "^14.0.3",
+		"sql.js": "^1.14.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	},
+	"devDependencies": {
+		"@types/node": "^25.6.0",
+		"@types/sql.js": "^1.4.11",
+		"prettier": "^3.8.3",
+		"typescript": "^6.0.3",
+		"vitest": "^3.2.4"
+	}
 }
