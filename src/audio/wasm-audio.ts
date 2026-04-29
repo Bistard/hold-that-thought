@@ -52,6 +52,7 @@ export class WasmAudioSource implements AudioSource {
     });
 
     this.ffmpeg.on('error', (err) => {
+      this.ffmpeg = null;
       this.emit('error', new Error(`ffmpeg 启动失败: ${err.message}`));
     });
 
