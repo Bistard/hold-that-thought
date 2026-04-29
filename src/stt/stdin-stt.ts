@@ -10,7 +10,9 @@ export class StdinSTT implements SpeechToText {
 	start(): void {
 		this.rl.on('line', (line: string) => {
 			const trimmed = line.trim();
-			if (!trimmed) return;
+			if (!trimmed) {
+				return;
+			}
 			const segment: TextSegment = {
 				id: generateId(),
 				text: trimmed,

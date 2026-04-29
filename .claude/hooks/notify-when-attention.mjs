@@ -32,18 +32,17 @@ try {
 			`  [void][System.Windows.Forms.MessageBox]::Show('${displayText}', 'Claude Code')` +
 			`}`;
 		execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', toastScript], {
-			stdio: 'ignore',
+			stdio: 'pipe',
 		});
 	} else if (os === 'darwin') {
 		execFileSync(
 			'osascript',
 			['-e', `display notification "${displayText}" with title "Claude Code"`],
-			{ stdio: 'ignore' },
+			{ stdio: 'pipe' },
 		);
 	} else {
-		// Linux — best-effort via notify-send; silently ignored if unavailable.
 		execFileSync('notify-send', ['Claude Code', `${displayText}`], {
-			stdio: 'ignore',
+			stdio: 'pipe',
 		});
 	}
 } catch (err) {

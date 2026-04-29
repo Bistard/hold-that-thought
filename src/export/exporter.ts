@@ -9,7 +9,9 @@ function tsDate(ms: number): string {
 }
 
 export function exportTranscript(segments: TextSegment[], opts: ExportOptions): string {
-	if (segments.length === 0) return '';
+	if (segments.length === 0) {
+		return '';
+	}
 
 	if (opts.format === 'md') {
 		let out = '## 转录导出\n\n';

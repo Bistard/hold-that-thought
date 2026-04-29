@@ -10,6 +10,9 @@
 		"build": "tsc",
 		"start": "node dist/index.js",
 		"dev": "tsc && node dist/index.js",
+		"format": "prettier --write . && eslint --fix .",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix .",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"typecheck": "tsc --noEmit"
@@ -28,10 +31,14 @@
 		]
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.39.4",
 		"@types/node": "^25.6.0",
 		"@types/sql.js": "^1.4.11",
+		"eslint": "^9.39.4",
+		"eslint-plugin-vue": "^10.9.0",
 		"prettier": "^3.8.3",
 		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.59.1",
 		"vitest": "^3.2.4"
 	}
 }

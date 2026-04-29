@@ -7,7 +7,9 @@ let SQL: SqlJsStatic | null = null;
 let sqlInitPromise: Promise<SqlJsStatic> | null = null;
 
 async function getSQL(): Promise<SqlJsStatic> {
-	if (SQL) return SQL;
+	if (SQL) {
+		return SQL;
+	}
 	if (!sqlInitPromise) {
 		sqlInitPromise = initSqlJs();
 	}
@@ -42,7 +44,9 @@ export class SegmentStore {
 	}
 
 	save(): void {
-		if (this.dbPath === ':memory:') return;
+		if (this.dbPath === ':memory:') {
+			return;
+		}
 		const data = this.db.export();
 		writeFileSync(this.dbPath, Buffer.from(data));
 	}
@@ -106,7 +110,9 @@ export class SegmentStore {
 		}
 		const row = stmt.getAsObject() as { min: number | null; max: number | null };
 		stmt.free();
-		if (row.min === null || row.max === null) return null;
+		if (row.min === null || row.max === null) {
+			return null;
+		}
 		return { min: row.min, max: row.max };
 	}
 

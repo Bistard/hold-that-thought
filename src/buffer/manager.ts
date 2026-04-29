@@ -45,10 +45,14 @@ export class BufferManager {
 
 	getTimeRange(): TimeRange | null {
 		const dbRange = this.store.getTimeRange();
-		if (this.hot.length === 0) return dbRange;
+		if (this.hot.length === 0) {
+			return dbRange;
+		}
 		const hotMin = this.hot[0].timestamp;
 		const hotMax = this.hot[this.hot.length - 1].timestamp;
-		if (!dbRange) return { min: hotMin, max: hotMax };
+		if (!dbRange) {
+			return { min: hotMin, max: hotMax };
+		}
 		return {
 			min: Math.min(dbRange.min, hotMin),
 			max: Math.max(dbRange.max, hotMax),
@@ -61,16 +65,23 @@ export class BufferManager {
 	}
 
 	private maybeFlush(): void {
-		if (this.hot.length < 2) return;
+		if (this.hot.length < 2) {
+			return;
+		}
 		const oldest = this.hot[0].timestamp;
 		const newest = this.hot[this.hot.length - 1].timestamp;
-		if (newest - oldest < this.options.hotMs) return;
+		if (newest - oldest < this.options.hotMs) {
+			return;
+		}
 
 		const cutoff = newest - this.options.hotMs;
 		const toFlush: TextSegment[] = [];
 		for (const s of this.hot) {
-			if (s.timestamp < cutoff) toFlush.push(s);
-			else break;
+			if (s.timestamp < cutoff) {
+				toFlush.push(s);
+			} else {
+				break;
+			}
 		}
 		if (toFlush.length > 0) {
 			this.store.insertBatch(toFlush);

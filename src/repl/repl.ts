@@ -14,9 +14,14 @@ function parseTime(input: string): number {
 	const relMatch = input.match(/^([+-])(\d+)(h|m)(?:(\d+)m)?$/);
 	if (relMatch) {
 		let ms = 0;
-		if (relMatch[3] === 'h') ms += parseInt(relMatch[2]) * 3600_000;
-		else ms += parseInt(relMatch[2]) * 60_000;
-		if (relMatch[4]) ms += parseInt(relMatch[4]) * 60_000;
+		if (relMatch[3] === 'h') {
+			ms += parseInt(relMatch[2]) * 3600_000;
+		} else {
+			ms += parseInt(relMatch[2]) * 60_000;
+		}
+		if (relMatch[4]) {
+			ms += parseInt(relMatch[4]) * 60_000;
+		}
 		const sign = relMatch[1] === '-' ? -1 : 1;
 		return Date.now() + sign * ms;
 	}
@@ -32,8 +37,12 @@ function parseTime(input: string): number {
 	if (ampmMatch) {
 		const d = new Date();
 		let h = parseInt(ampmMatch[1]);
-		if (ampmMatch[2].toLowerCase() === 'pm' && h !== 12) h += 12;
-		if (ampmMatch[2].toLowerCase() === 'am' && h === 12) h = 0;
+		if (ampmMatch[2].toLowerCase() === 'pm' && h !== 12) {
+			h += 12;
+		}
+		if (ampmMatch[2].toLowerCase() === 'am' && h === 12) {
+			h = 0;
+		}
 		d.setHours(h, 0, 0, 0);
 		return d.getTime();
 	}
@@ -51,7 +60,9 @@ function parseTime(input: string): number {
 function formatDuration(ms: number): string {
 	const h = Math.floor(ms / 3600_000);
 	const m = Math.floor((ms % 3600_000) / 60_000);
-	if (h > 0) return `${h}h${m}m`;
+	if (h > 0) {
+		return `${h}h${m}m`;
+	}
 	return `${m}m`;
 }
 

@@ -8,7 +8,9 @@ import { mkdirSync } from 'node:fs';
 
 function parseDuration(s: string): number {
 	const match = s.match(/^(\d+)(h|m)$/);
-	if (!match) throw new Error(`无法解析时长: ${s}`);
+	if (!match) {
+		throw new Error(`无法解析时长: ${s}`);
+	}
 	const val = parseInt(match[1]);
 	return match[2] === 'h' ? val * 3600_000 : val * 60_000;
 }
