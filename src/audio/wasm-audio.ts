@@ -24,6 +24,7 @@ export class WasmAudioSource implements AudioSource {
 
   start(): void {
     if (this.ffmpeg) return; // already started
+    this.stopping = false;
 
     const args = [
       '-f', 'dshow',

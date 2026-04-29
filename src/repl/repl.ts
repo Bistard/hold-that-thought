@@ -122,7 +122,11 @@ export function startRepl(manager: BufferManager, audioSource?: AudioSource): vo
   rl.on('close', () => {
     audioSource?.stop();
     console.log(chalk.yellow('\n正在保存缓冲数据...'));
-    manager.shutdown();
+    try {
+      manager.shutdown();
+    } catch (err) {
+      console.error(chalk.red(`保存缓冲数据失败: ${(err as Error).message}`));
+    }
     console.log(chalk.green('再见。'));
     process.exit(0);
   });

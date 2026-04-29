@@ -97,7 +97,9 @@ export class SherpaSTT implements SpeechToText {
             timestamp: Date.now(),
           });
         }
-        this.recognizer.reset(this.stream);
+        if (this.recognizer.isEndpoint(this.stream)) {
+          this.recognizer.reset(this.stream);
+        }
       }
     } catch (err) {
       this.emit('error', err as Error);
