@@ -49,11 +49,31 @@
 	"hooks": {
 		"Notification": [
 			{
-				"matcher": "permission_prompt|elicitation_complete|elicitation_dialog",
+				"matcher": "permission_prompt|elicitation_dialog",
 				"hooks": [
 					{
 						"type": "command",
 						"command": "node .claude/hooks/notify-when-attention.mjs"
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node .claude/hooks/notify-when-attention.mjs --hook-type stop"
+					}
+				]
+			}
+		],
+		"StopFailure": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node .claude/hooks/notify-when-attention.mjs --hook-type stop_failure"
 					}
 				]
 			}
